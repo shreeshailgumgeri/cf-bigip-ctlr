@@ -42,6 +42,8 @@ COPY entrypoint.builder.sh /entrypoint.sh
 COPY requirements.txt /tmp/requirements.txt
 COPY requirements.docs.txt /tmp/requirements.docs.txt
 
+RUN pip install pip==18.0.0
+
 RUN apk add --no-cache \
 		bash \
 		gcc \
@@ -54,11 +56,11 @@ RUN apk add --no-cache \
 	pip install --process-dependency-links -r /tmp/requirements.txt && \
 	pip install -r /tmp/requirements.docs.txt && \
         pip install virtualenv && \
-	go get github.com/wadey/gocovmerge && \
-        go get github.com/nats-io/gnatsd && \
-        go get github.com/onsi/ginkgo/ginkgo && \
-        go get github.com/onsi/gomega && \
-        go get github.com/mattn/goveralls && \
+#	go get github.com/wadey/gocovmerge && \
+#	go get github.com/nats-io/nats && \
+#        go get github.com/onsi/ginkgo/ginkgo && \
+#        go get github.com/onsi/gomega && \
+#        go get github.com/mattn/goveralls && \
 	chmod 755 /entrypoint.sh
 
 ENTRYPOINT [ "/entrypoint.sh" ]

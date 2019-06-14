@@ -1,1 +1,1 @@
-package debugserver
+package debugserver // import "code.cloudfoundry.org/debugserver"
