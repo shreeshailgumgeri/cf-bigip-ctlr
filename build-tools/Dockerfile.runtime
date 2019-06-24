@@ -12,6 +12,8 @@ COPY requirements.txt /tmp/requirements.txt
 COPY cf-schema_v*.json $APPPATH/schema/
 COPY VERSION_BUILD.json $APPPATH/vendor/src/f5/
 
+RUN pip install pip==18.0.0
+
 RUN apk --no-cache --update add --virtual pip-install-deps git && \
     pip install --process-dependency-links -r /tmp/requirements.txt && \
     apk del pip-install-deps

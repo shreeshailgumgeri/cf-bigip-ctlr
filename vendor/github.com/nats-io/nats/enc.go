@@ -1,15 +1,4 @@
-// Copyright 2012-2019 The NATS Authors
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright 2012-2015 Apcera Inc. All rights reserved.
 
 package nats
 
@@ -21,7 +10,7 @@ import (
 	"time"
 
 	// Default Encoders
-	"github.com/nats-io/nats.go/encoders/builtin"
+	. "github.com/nats-io/nats/encoders/builtin"
 )
 
 // Encoder interface is for all register encoders
@@ -43,9 +32,9 @@ const (
 func init() {
 	encMap = make(map[string]Encoder)
 	// Register json, gob and default encoder
-	RegisterEncoder(JSON_ENCODER, &builtin.JsonEncoder{})
-	RegisterEncoder(GOB_ENCODER, &builtin.GobEncoder{})
-	RegisterEncoder(DEFAULT_ENCODER, &builtin.DefaultEncoder{})
+	RegisterEncoder(JSON_ENCODER, &JsonEncoder{})
+	RegisterEncoder(GOB_ENCODER, &GobEncoder{})
+	RegisterEncoder(DEFAULT_ENCODER, &DefaultEncoder{})
 }
 
 // EncodedConn are the preferred way to interface with NATS. They wrap a bare connection to
@@ -67,7 +56,7 @@ func NewEncodedConn(c *Conn, encType string) (*EncodedConn, error) {
 	}
 	ec := &EncodedConn{Conn: c, Enc: EncoderForType(encType)}
 	if ec.Enc == nil {
-		return nil, fmt.Errorf("no encoder registered for '%s'", encType)
+		return nil, fmt.Errorf("No encoder registered for '%s'", encType)
 	}
 	return ec, nil
 }
@@ -130,7 +119,7 @@ func (c *EncodedConn) Request(subject string, v interface{}, vPtr interface{}, t
 
 // Handler is a specific callback used for Subscribe. It is generalized to
 // an interface{}, but we will discover its format and arguments at runtime
-// and perform the correct callback, including de-marshaling JSON strings
+// and perform the correct callback, including de-marshalling JSON strings
 // back into the appropriate struct based on the signature of the Handler.
 //
 // Handlers are expected to have one of four signatures.
@@ -207,9 +196,9 @@ func (c *EncodedConn) subscribe(subject, queue string, cb Handler) (*Subscriptio
 			}
 			if err := c.Enc.Decode(m.Subject, m.Data, oPtr.Interface()); err != nil {
 				if c.Conn.Opts.AsyncErrorCB != nil {
-					c.Conn.ach.push(func() {
+					c.Conn.ach <- func() {
 						c.Conn.Opts.AsyncErrorCB(c.Conn, m.Sub, errors.New("nats: Got an error trying to unmarshal: "+err.Error()))
-					})
+					}
 				}
 				return
 			}
@@ -234,7 +223,7 @@ func (c *EncodedConn) subscribe(subject, queue string, cb Handler) (*Subscriptio
 		cbValue.Call(oV)
 	}
 
-	return c.Conn.subscribe(subject, queue, natsCB, nil, false)
+	return c.Conn.subscribe(subject, queue, natsCB, nil)
 }
 
 // FlushTimeout allows a Flush operation to have an associated timeout.
@@ -252,15 +241,6 @@ func (c *EncodedConn) Flush() error {
 // all blocking calls, such as Flush(), etc.
 func (c *EncodedConn) Close() {
 	c.Conn.Close()
-}
-
-// Drain will put a connection into a drain state. All subscriptions will
-// immediately be put into a drain state. Upon completion, the publishers
-// will be drained and can not publish any additional messages. Upon draining
-// of the publishers, the connection will be closed. Use the ClosedCB()
-// option to know when the connection has moved from draining to closed.
-func (c *EncodedConn) Drain() error {
-	return c.Conn.Drain()
 }
 
 // LastError reports the last error encountered via the Connection.

@@ -1,11 +1,11 @@
 #!/bin/bash
 
 
-set -e
+set -ex
 
 CURDIR="$(dirname $BASH_SOURCE)"
-
 . $CURDIR/_build-lib.sh
+
 BUILDDIR=$(get_builddir)
 
 export BUILDDIR=$BUILDDIR

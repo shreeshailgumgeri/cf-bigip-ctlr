@@ -89,6 +89,7 @@ ginkgo_test_with_coverage () {
 
   (
     export GOBIN="$BUILDDIR/bin"
+    export PATH=$PATH:$GOBIN
     echodo cd "$WKDIR/src/$PKGIMPORT"
     echodo ginkgo -r -keepGoing -trace -randomizeAllSpecs -progress --nodes 4 -cover
     echo "Gathering unit test code coverage for 'release' build..."
@@ -151,3 +152,4 @@ tmpdir_for_test() {
   rsync -a --exclude '.git' --exclude '_docker_workspace' $GOPATH/src/ $WKDIR/src
   echo $WKDIR
 }
+

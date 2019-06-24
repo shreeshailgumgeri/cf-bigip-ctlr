@@ -134,7 +134,7 @@ func (broker *ServiceBroker) ProcessPlans() error {
 }
 
 // Services that are available for provisioning
-func (broker *ServiceBroker) Services(ctx context.Context) []brokerapi.Service {
+func (broker *ServiceBroker) Services(ctx context.Context) ([]brokerapi.Service, error) {
 	plans := broker.prepPlansforAPIResponse()
 
 	return []brokerapi.Service{
@@ -149,7 +149,7 @@ func (broker *ServiceBroker) Services(ctx context.Context) []brokerapi.Service {
 				"f5",
 			},
 		},
-	}
+	}, nil
 }
 
 // Provision verify that the requested plan exists for the bigip service

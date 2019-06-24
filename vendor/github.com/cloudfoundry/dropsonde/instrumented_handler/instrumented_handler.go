@@ -38,7 +38,8 @@ func (ih *instrumentedHandler) ServeHTTP(rw http.ResponseWriter, req *http.Reque
 			log.Printf("failed to generate request ID: %v\n", err)
 			requestId = &uuid.UUID{}
 		}
-		req.Header.Set("X-Vcap-Request-Id", requestId.String())
+		//req.Header.Set("X-Vcap-Request-Id", requestId.String())
+		req.Header.Add("X-Vcap-Request-Id", requestId.String())
 	}
 	rw.Header().Set("X-Vcap-Request-Id", requestId.String())
 
